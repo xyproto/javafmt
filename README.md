@@ -11,7 +11,7 @@ For both Java and Kotlin, organize imports and then format the code with either 
 
 ```
 cd my-java-project
-javafmt
+javafmt -w
 ```
 
 ## Quick installation
@@ -20,5 +20,5 @@ javafmt
 
 ## General info
 
-* Version: 0.0.1
+* Version: 0.0.2
 * License: BSD-3

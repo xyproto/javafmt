@@ -13,7 +13,7 @@ import (
 	"github.com/xyproto/autoimport"
 )
 
-const versionString = "javafmt 0.0.1"
+const versionString = "javafmt 0.0.2"
 
 func organizeImports(data []byte, onlyJava, removeExistingImports, verbose bool) []byte {
 	ima, err := autoimport.New(onlyJava, removeExistingImports)
