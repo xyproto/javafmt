@@ -10,8 +10,11 @@ import (
 	"os/exec"
 	"path/filepath"
 
+	"github.com/spf13/pflag"
 	"github.com/xyproto/autoimport"
 )
+
+const versionString = "javafmt 0.0.1"
 
 func organizeImports(data []byte, onlyJava, removeExistingImports, verbose bool) []byte {
 	ima, err := autoimport.New(onlyJava, removeExistingImports)
@@ -92,9 +95,35 @@ func formatFile(filename string, writeToFiles, verbose bool) {
 }
 
 func main() {
-	writeToFiles := flag.Bool("w", false, "Write changes back to the files instead of outputting to stdout")
-	verbose := flag.Bool("v", false, "Verbose mode")
-	flag.Parse()
+	var showVersion bool
+	var showHelp bool
+	var writeToFiles bool
+	var verbose bool
+
+	pflag.BoolVarP(&showVersion, "version", "V", false, "Print version")
+	pflag.BoolVar(&showHelp, "help", false, "Show help")
+	pflag.BoolVarP(&writeToFiles, "write", "w", false, "Write changes back to the files instead of outputting to stdout")
+	pflag.BoolVarP(&verbose, "verbose", "v", false, "Verbose mode")
+
+	pflag.Usage = func() {
+		fmt.Printf("Usage of %s:\n\n", os.Args[0])
+		fmt.Println("A utility for formatting Java and Kotlin code.")
+		fmt.Println("It organizes imports and formats the code using `google-java-format` for Java files and `ktlint` for Kotlin files.\n")
+		pflag.PrintDefaults()
+		fmt.Println()
+	}
+
+	pflag.Parse()
+
+	if showHelp {
+		pflag.Usage()
+		return
+	}
+
+	if showVersion {
+		fmt.Println(versionString)
+		return
+	}
 
 	args := flag.Args()
 	if len(args) == 0 && !isStdinAvailable() {
@@ -103,7 +132,7 @@ func main() {
 		kotlinFiles, _ := filepath.Glob("*.kt")
 		files = append(files, kotlinFiles...)
 		for _, f := range files {
-			formatFile(f, *writeToFiles, *verbose)
+			formatFile(f, writeToFiles, verbose)
 		}
 	} else if len(args) == 0 && isStdinAvailable() {
 		// Reading from stdin
@@ -112,13 +141,13 @@ func main() {
 			fmt.Fprintf(os.Stderr, "Error reading from stdin: %v\n", err)
 			os.Exit(1)
 		}
-		formatData("stdin", data, false, *verbose)
+		formatData("stdin", data, false, verbose)
 	} else {
 		// Format specific files or patterns
 		for _, pattern := range args {
 			files, _ := filepath.Glob(pattern)
 			for _, f := range files {
-				formatFile(f, *writeToFiles, *verbose)
+				formatFile(f, writeToFiles, verbose)
 			}
 		}
 	}
