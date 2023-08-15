@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"flag"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -63,9 +62,17 @@ func formatData(filename string, data []byte, writeToFiles, verbose bool) {
 	case ".java":
 		data = organizeImports(data, true, false, verbose)
 		newData, err = formatJava(data)
+		if len(newData) == 0 {
+			fmt.Fprintf(os.Stderr, "Error: Formatted data for %s is empty. Skipping to prevent data loss.\n", filename)
+			return
+		}
 	case ".kt":
 		data = organizeImports(data, false, false, verbose)
 		newData, err = formatKotlin(data)
+		if len(newData) == 0 {
+			fmt.Fprintf(os.Stderr, "Error: Formatted data for %s is empty. Skipping to prevent data loss.\n", filename)
+			return
+		}
 	default:
 		return
 	}
@@ -125,7 +132,7 @@ func main() {
 		return
 	}
 
-	args := flag.Args()
+	args := pflag.Args()
 	if len(args) == 0 && !isStdinAvailable() {
 		// No argument and not reading from stdin; process all *.java and *.kt files in the current directory
 		files, _ := filepath.Glob("*.java")
