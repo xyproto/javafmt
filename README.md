@@ -20,5 +20,5 @@ javafmt -w
 
 ## General info
 
-* Version: 0.0.2
+* Version: 0.0.3
 * License: BSD-3

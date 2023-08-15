@@ -13,7 +13,7 @@ import (
 	"github.com/xyproto/autoimport"
 )
 
-const versionString = "javafmt 0.0.2"
+const versionString = "javafmt 0.0.3"
 
 func organizeImports(data []byte, onlyJava, removeExistingImports, verbose bool) []byte {
 	ima, err := autoimport.New(onlyJava, removeExistingImports)
@@ -30,7 +30,7 @@ func organizeImports(data []byte, onlyJava, removeExistingImports, verbose bool)
 }
 
 func formatJava(data []byte) ([]byte, error) {
-	cmd := exec.Command("google-java-format", "-a")
+	cmd := exec.Command("google-java-format", "-a", "-")
 	cmd.Stdin = bytes.NewReader(data)
 	var out bytes.Buffer
 	cmd.Stdout = &out
