@@ -1,3 +1,5 @@
+github.com/spf13/pflag v1.0.5 h1:iy+VFUOCP1a+8yFto/drg2CJ5u0yRoB7fZw3DKv/JXA=
+github.com/spf13/pflag v1.0.5/go.mod h1:McXfInJRrz4CZXVZOBLb0bTZqETkiAhM9Iw0y3An2Bg=
 github.com/xyproto/autoimport v1.4.3 h1:qHJXw39W86HfCHam2g1DQ/1pCYf0+mN/z6av7FfB+vM=
 github.com/xyproto/autoimport v1.4.3/go.mod h1:oMpZH3aIPh1SL376CkT/w/pGsGgk1SyXOxcPDzl2Dp0=
 github.com/xyproto/env/v2 v2.1.0 h1:5R8dtjbhwqFgKo3tFJKRW3M/8lPbhLu+Jw877El+jKg=
