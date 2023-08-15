@@ -2,8 +2,6 @@
 
 For both Java and Kotlin, **organize imports** and then format the code with `google-java-format` or `ktlint`, depending on the file extension.
 
-NOTE: This utility is a bit experimental and has only been tested on Java code so far.
-
 ## Requirements
 
 * `google-java-format`
@@ -26,6 +24,10 @@ javafmt -w
 ## Quick installation
 
     go install github.com/xyproto/javafmt@latest
+
+## Issues
+
+This utility is a bit experimental, so the correct imports may not always be used. Bug reports and pull requests are welcome!
 
 ## General info
 
