@@ -1,6 +1,6 @@
 # javafmt
 
-For both Java and Kotlin, **organize imports** and then format the code with `google-java-format` or `ktlint`, depending on the file extension.
+For both Java and Kotlin, **automatically add or remove imports** and then format the code with `google-java-format` or `ktlint`, depending on the file extension.
 
 ## Requirements
 
