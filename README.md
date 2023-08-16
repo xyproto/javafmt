@@ -21,7 +21,16 @@ cd my-java-project
 javafmt -w
 ```
 
+Or to format all `.kt` and `.java` in a directory, but not touch the imports:
+
+```
+cd my-java-project
+javafm -n -w
+```
+
 ## Quick installation
+
+Requires Go 1.21 or later:
 
     go install github.com/xyproto/javafmt@latest
 
@@ -31,5 +40,6 @@ This utility is a bit experimental, so the correct imports may not always be use
 
 ## General info
 
-* Version: 0.0.3
+* Version: 1.0.0
 * License: BSD-3
+* Author: Alexander F. Rødseth &lt;xyproto@archlinux.org&gt;

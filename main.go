@@ -14,7 +14,7 @@ import (
 	"github.com/xyproto/files"
 )
 
-const versionString = "javafmt 0.0.3"
+const versionString = "javafmt 1.0.0"
 
 var isStdinAvailable func() bool = files.DataReadyOnStdin
 
