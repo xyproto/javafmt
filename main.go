@@ -11,11 +11,14 @@ import (
 
 	"github.com/spf13/pflag"
 	"github.com/xyproto/autoimport"
+	"github.com/xyproto/files"
 )
 
 const versionString = "javafmt 0.0.3"
 
-func organizeImports(data []byte, onlyJava, removeExistingImports, verbose bool) []byte {
+var isStdinAvailable func() bool = files.DataReadyOnStdin
+
+func organizeImportsInSource(data []byte, onlyJava, removeExistingImports, verbose bool) []byte {
 	ima, err := autoimport.New(onlyJava, removeExistingImports)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Warning: Could not organize imports: %v\n", err)
@@ -53,21 +56,25 @@ func formatKotlin(data []byte) ([]byte, error) {
 	return out.Bytes(), nil
 }
 
-func formatData(filename string, data []byte, writeToFiles, verbose bool) {
+func formatData(filename string, data []byte, writeToFiles, organizeImports, verbose bool) {
 	var err error
 	var newData []byte
 
 	ext := filepath.Ext(filename)
 	switch ext {
 	case ".java":
-		data = organizeImports(data, true, false, verbose)
+		if organizeImports {
+			data = organizeImportsInSource(data, true, false, verbose)
+		}
 		newData, err = formatJava(data)
 		if len(newData) == 0 {
 			fmt.Fprintf(os.Stderr, "Error: Formatted data for %s is empty. Skipping to prevent data loss.\n", filename)
 			return
 		}
 	case ".kt":
-		data = organizeImports(data, false, false, verbose)
+		if organizeImports {
+			data = organizeImportsInSource(data, false, false, verbose)
+		}
 		newData, err = formatKotlin(data)
 		if len(newData) == 0 {
 			fmt.Fprintf(os.Stderr, "Error: Formatted data for %s is empty. Skipping to prevent data loss.\n", filename)
@@ -92,25 +99,29 @@ func formatData(filename string, data []byte, writeToFiles, verbose bool) {
 	}
 }
 
-func formatFile(filename string, writeToFiles, verbose bool) {
+func formatFile(filename string, writeToFiles, organizeImports, verbose bool) {
 	data, err := ioutil.ReadFile(filename)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error reading file %s: %v\n", filename, err)
 		return
 	}
-	formatData(filename, data, writeToFiles, verbose)
+	formatData(filename, data, writeToFiles, organizeImports, verbose)
 }
 
 func main() {
-	var showVersion bool
-	var showHelp bool
-	var writeToFiles bool
-	var verbose bool
+	var (
+		noimp        bool
+		showVersion  bool
+		showHelp     bool
+		verbose      bool
+		writeToFiles bool
+	)
 
+	pflag.BoolVarP(&noimp, "noimp", "n", false, "Don't add or remove imports")
 	pflag.BoolVarP(&showVersion, "version", "V", false, "Print version")
 	pflag.BoolVar(&showHelp, "help", false, "Show help")
-	pflag.BoolVarP(&writeToFiles, "write", "w", false, "Write changes back to the files instead of outputting to stdout")
 	pflag.BoolVarP(&verbose, "verbose", "v", false, "Verbose mode")
+	pflag.BoolVarP(&writeToFiles, "write", "w", false, "Write changes back to the files instead of outputting to stdout")
 
 	pflag.Usage = func() {
 		fmt.Printf("Usage of %s:\n\n", os.Args[0])
@@ -139,7 +150,7 @@ func main() {
 		kotlinFiles, _ := filepath.Glob("*.kt")
 		files = append(files, kotlinFiles...)
 		for _, f := range files {
-			formatFile(f, writeToFiles, verbose)
+			formatFile(f, writeToFiles, !noimp, verbose)
 		}
 	} else if len(args) == 0 && isStdinAvailable() {
 		// Reading from stdin
@@ -148,19 +159,14 @@ func main() {
 			fmt.Fprintf(os.Stderr, "Error reading from stdin: %v\n", err)
 			os.Exit(1)
 		}
-		formatData("stdin", data, false, verbose)
+		formatData("stdin", data, false, !noimp, verbose)
 	} else {
 		// Format specific files or patterns
 		for _, pattern := range args {
 			files, _ := filepath.Glob(pattern)
 			for _, f := range files {
-				formatFile(f, writeToFiles, verbose)
+				formatFile(f, writeToFiles, !noimp, verbose)
 			}
 		}
 	}
-}
-
-func isStdinAvailable() bool {
-	stat, _ := os.Stdin.Stat()
-	return (stat.Mode() & os.ModeCharDevice) == 0
 }
